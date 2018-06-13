@@ -1,0 +1,301 @@
+<!--Робота з тегом Canvas-->
+<!--
+1) <canvas> - тег HTML5, який дозволяє працювати з растровою графікою на стороні клієнта засобами
+   javascript. Атрибут width та height необхідно задавати в тегу canvas,
+	 інакше встановлюються розміри по замовчуванню 300 на 150 px і застосування
+	 css правил для висоти та ширини буде призводити
+   до масштабування області.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas</title>
+	<script src="modernizr.js"></script>
+	<script src="jquery.js"></script>
+	<script>
+		$(document).ready(function(){
+
+//	2) 	Підключаєм бібліотеку Modernizr.js і перевіряєм, чи підтримує браузер тег canvas,
+//		створюємо об'єкт контексту(context) для роботи з canvas
+			if(!Modernizr.canvas) return;
+			//var canvas = document.getElementById("canvas");
+            //var context = canvas.getContext("2d");
+			var context=$("#canvas")[0].getContext("2d");
+
+//	3) 	Метод save() - зберігає копію текучого стану контексту
+			context.save();
+
+//	4) 	Метод beginPath() використовується для початку серії дій для відмальовки фігури, кожен
+//		наступний виклик методу ощищує всі дії попереднього і починає малювати заново
+			context.beginPath();
+//
+//	5) 	Метод moveTo(x,y) -переміщає курсор в позицію x,y і робить її текучою
+			context.moveTo(10,10);
+
+//	6) 	Метод lineTo(x,y) -веде лінію з текучої позиції в позицію (x,y), яка стає текучою
+			context.lineTo(100,10);
+			context.lineTo(100,100);
+			context.lineTo(10,100);
+			//context.lineTo(10,10);
+
+//	7) 	Метод closePath() -текучу позицію з'єднує з початковою точкою фігури (замикає фігуру)
+// 		текучу позицію з'єднує з стартовою
+			context.closePath();
+
+//	8) 	Метод stroke()-обводить фігуру лініями
+			context.stroke();
+
+//  9) 	Метод clearRect(x1,x2,x3,x4)-очищує прямокутну область, (x1,x2) -верхня ліва координата
+//		(x3,x4)-нижня права;
+			context.clearRect(0,0,context.canvas.width,context.canvas.height); //очистка canvas
+			//context.beginPath();
+			//context.stroke();
+
+//	10) Meтод rect(x1,x2,x3,x4)-будує прямокутник, (x1,x2) -верхня ліва координата
+//		(x3,x4)-нижня права;
+			context.beginPath();
+			context.rect(10,10,20,40);
+			context.stroke();
+
+//	11) Метод restore() - відновлює останній збережений стан контексту (лише раз)
+			context.restore();
+
+//	12) Метод translate(x,y) - зміщення початку координат контексту в координату (x,y)
+			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+			for (var i=0;i<5;i++){
+				context.save();
+				context.beginPath();
+				context.translate(110*i,10);
+				context.rect(10,10,100,100);
+				context.stroke();
+				context.restore();
+			}
+
+//	13) Методи стилів для ліній - lineWidth=x, strokeStyle=color, lineJoin=(round||bevel||miter)
+			context.lineWidth=4;
+			context.strokeStyle="blue";
+			context.lineJoin="round";
+
+/*//	14) Методи стилів для заливки області - fillStyle=color, fill() - заливка*/
+			context.fillStyle = "yellow";
+        	context.fill();
+
+//	15) Методи strokeRect(x1,x2,x3,x4),fillRect(x1,y1,x2,y2) -створюють та обводять(заливають)
+//		прямокутник
+			context.strokeRect(200,200,50,50);
+			context.fillRect(200,200,50,50);
+			context.clearRect(196,196,58,58);
+
+//	16) Метод arc(x,y,radius,startRad,endRad,ort). x,y-координати центру, radius - радіус,
+//		startRad,endRad-початок та кінець дуги(в радіанах),
+//		ort-напрям (по замовчуванню false-за годинниковою стрілкою)
+			var colors=["red","yellow","blue","green"];
+			context.save();
+			context.translate(10,130);
+			for(var i=0;i<4;i++){
+			context.fillStyle=colors[i];
+			context.strokeStyle=colors[colors.length-i-1];
+			for(var j=0;j<4;j++){
+				context.save();
+				context.translate(90*j,90*i);
+				context.beginPath();
+				context.arc(40,40,40,0,2*Math.PI,false);
+				context.fill();
+				context.stroke();
+				context.restore();
+				}
+			}
+			context.restore();
+			//context.clearRect(0,0,context.canvas.width,context.canvas.height);
+/*
+//	17) Метод quadraticCurveTo(controlX,controlY,x2,y2), x1,x2 - текуча точка
+			context.save();
+			context.beginPath();
+			context.moveTo(200,200);
+			context.quadraticCurveTo(300,10,400,200);
+			context.stroke();
+			context.restore();
+
+//	18)	Метод bezierCurveTo(controlX1,controlY1,controlX2,controlY2,x2,y2), x1,x2 - текуча точка
+			context.save();
+			context.beginPath();
+			context.moveTo(500,200);
+			context.bezierCurveTo(550,300,600,50,650,200);
+			context.strokeStyle="red";
+			context.stroke();
+			context.restore();
+			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+
+//	19)	Метод drawImage(logo,x,y)-завантажує зображення, logo-об'єкт, який характеризує зображення,
+//		x,y-ліва верхня координата зображення
+			var img=new Image();
+			img.onload=function(){
+			context.drawImage(img,10,10);
+			}
+			img.src="html5.png";
+			context.fillStyle="white";
+			//img.src="";
+
+//	20)	Метод createPattern(logo,repeat||repeat-x||repeat-y) -задає фон у вигляді зображення,
+//	    logo-об'єкт, який характеризує зображення, repeat-розмноження зображення
+			var img=new Image();
+			img.src="html5.png";
+			img.onload=function(){
+				context.fillStyle=context.createPattern(img,"repeat");
+				context.fillRect(0,0,context.canvas.width,context.canvas.height);
+			}
+			img.src="";
+
+//	21)	Метод createLinearGradient(x1,y1,x2,y2) -задає вектор застосування градієнту
+	    	var grad=context.createLinearGradient(0,0,0,context.canvas.height);
+	    	//додавання кольорів та позиції застосування
+	    	grad.addColorStop(0,"green");
+	    	grad.addColorStop(0.5,"limegreen");
+	    	grad.addColorStop(1,"lightgreen");
+	    	context.fillStyle=grad;
+	    	context.fillRect(0,0,context.canvas.width,context.canvas.height);
+	    	// очищуєм canvas
+	    	context.clearRect(0,0,context.canvas.width,context.canvas.height);
+	    	var grad=context.createLinearGradient(100,100,200,200);
+	    	grad.addColorStop(0,"red");
+	    	grad.addColorStop(1,"orange");
+	    	context.fillStyle=grad;
+	    	context.fillRect(100,100,100,100);
+	    	var grad2=context.createLinearGradient(150,150,250,250);
+	    	grad2.addColorStop(0,"rgba(0,0,0,0.5)");
+	    	grad2.addColorStop(0.5,"rgba(100,100,100,0.5)");
+	    	grad2.addColorStop(1,"rgba(190,190,190,0.5)");
+	    	context.fillStyle=grad2;
+	    	context.fillRect(150,150,100,100);
+
+//	22)	Метод createRadialGradient(x1,y1,R1,x2,y2,R2) -задає круговий градієнт,
+//		x1,y1 та x2,y2 - центри відповідних кіл, R1 та R2 - їхні радіуси
+			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+			var gradient=context.createRadialGradient(150,150,100,150,150,200);
+			gradient.addColorStop(0,"orange");
+			gradient.addColorStop(1,"yellow");
+			context.fillStyle=gradient;
+			context.fillRect(0,0,300,300);
+
+//	23)	Метод scale(x,y)-масштабування, x,y-коефіцієнти масштабування по осях
+			var img=new Image();
+			img.src="html5.png";
+			img.onload=draw;
+			$("#btn").click(draw);
+			function draw(){
+				context.clearRect(0,0,context.canvas.width,context.canvas.height);
+				var x=$("#x").val();
+				var y=$("#y").val();
+				context.save();
+				context.scale(x,y);
+				context.drawImage(img,20,20,200,150);
+				context.restore();
+			}
+			img.src="";
+			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+
+//
+//	24)	Метод rotate(x)-поворот відносно початку координат, x-кут в радіанах;
+			var img=new Image();
+			img.src="html5.png";
+			img.onload=draw1;
+			$("#btn1").click(draw1);
+			function draw1(){
+				context.clearRect(0,0,context.canvas.width,context.canvas.height);
+				var z=$("#z").val();
+				context.save();
+				context.translate(100,100);
+				context.rotate(z*Math.PI/180);
+				context.drawImage(img,-100,-75,200,150);
+				context.restore();
+			}
+			//img.src="";
+			//context.clearRect(0,0,context.canvas.width,context.canvas.height);
+
+// //	25)	Метод transform(a,b,c,d,tx,ty)-трансформація елементу,
+// //		a-масштаб по осі Х,*/
+// //		b-викревлення по осі Y,
+// //		с-викревлення по осі X,
+// //		d-масштаб по осі Y,
+// //		tx-переміщення по осі X,
+// //		ty-переміщення по осі Y,
+// 			context.save();
+// 			context.translate(100,100);
+// 			context.fillStyle="limegreen";
+// 			//параметри по замовчуванню (відсутня трансформація)
+// 			//context.transform(1,0,0,1,0,0);
+// 			context.transform(1,1,0.5,1,0,0);
+// 			context.fillRect(0,0,100,100);
+// 			context.restore();
+// 			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+//
+// //	26)	Методи для роботи з текстом:
+// //		fillText(text,x,y), strokeText(text,x,y)-виводить текст в координатах x та y
+// //		font("bold 20px Arial")-задає вигляд шрифту
+// //		measureText(text).width-повертає ширину тексту
+// //		textBaseline(middle||top||bottom)-вертикальне позиціонування тексту
+// //		textAlign(center||start||end)-горизонтальне позиціонування тексту
+// 			context.save();
+// 			context.fillStyle="red";
+// 			context.strokeStyle="limegreen";
+// 			context.font="bold 50px Verdana";
+// 			var text="HTML5";
+// 			context.beginPath();
+// 			context.moveTo(0,100)
+// 			context.lineTo(context.canvas.width,100);
+// 			context.lineWidth=1;
+// 			context.stroke();
+// 			context.textBaseline="middle";
+// 			var width=context.measureText(text);
+// 			context.fillText(text,(context.canvas.width-width.width)/2,100);
+// 			context.lineWidth=3;
+// 			context.strokeText(text,200,200);
+// 			context.restore();
+// 			context.clearRect(0,0,context.canvas.width,context.canvas.height);
+//
+// //	27)	Методи для роботи з тінню:
+// //		shadowBlur=x - розмір розмиття тіні
+// //		shadowColor=color - задає колір тіні
+// //		shadowOffsetX=x - розмір тіні по осі X
+// //		shadowOffsetY=y - розмір тіні по осі Y
+// 			context.save();
+// 			context.fillStyle="blue";
+// 			context.font="bold 50px Verdana";
+// 			var text="Lyubomyr";
+// 			var w=context.measureText(text);
+// 			context.shadowColor="lightblue";
+// 			context.shadowOffsetX=5;
+// 			context.shadowOffsetY=5;
+// 			context.shadowBlur=5;
+// 			context.fillText(text,(context.canvas.width-w.width)/2,200);
+// 			context.restore();
+		})
+	</script>
+	<style>
+	#canvas{
+		border:2px red solid;
+	}
+	#scale,#rotate{
+		border: 4px limegreen solid;
+		display:inline-block;
+	}
+	</style>
+</head>
+<body>
+<canvas id="canvas" width="800" height="500">
+	<p>Ваш браузер не підтримує <b>Canvas</b>!</p>
+</canvas>
+<div id="scale">
+	Масштаб X:
+	<input id="x" type="text" value="1">
+	Масштаб Y:
+	<input id="y" type="text" value="1">
+	<input id="btn" type="button" value="Scale">
+</div>
+<div id="rotate">
+	Кут повороту:
+	<input id="z" type="text" value="0">
+	<input id="btn1" type="button" value="Rotate">
+	</div>
+</body>
+</html>
